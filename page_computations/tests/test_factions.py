@@ -1,25 +1,26 @@
 import pytest
 from app import app
 
+# TEST DATA RUNS FROM 2013 - 2014
 
 """WINRATES TESTS"""
 
 def test_winrates(client):
     response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2017&e_year=2020&num_players=3')
+    'faction=dwarves&s_year=2013&e_year=2014&num_players=3')
     
     assert response.status_code == 200
 
     data = response.get_json()
     
     assert data['faction'] == 'dwarves'
-    assert data['winrate'] == 27.01
-    assert data['total_games'] == 1018
-    assert data['total_wins'] == 275
+    assert data['winrate'] == 27.34
+    assert data['total_games'] == 395
+    assert data['total_wins'] == 108
 
 def test_winrates_missing_param(client):
     response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2017&e_year=2020')
+    'faction=dwarves&s_year=2013&e_year=2014')
 
     assert response.status_code == 400
     data = response.get_json()
@@ -29,7 +30,7 @@ def test_winrates_missing_param(client):
 def test_winrates_invalid_type(client):
 
     response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2017&e_year=2020&num_players=INVALID')
+    'faction=dwarves&s_year=2013&e_year=2014&num_players=INVALID')
 
     assert response.status_code == 400
     data = response.get_json()
@@ -38,7 +39,7 @@ def test_winrates_invalid_type(client):
 
 def test_winrates_oob(client):
     response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2017&e_year=2020&num_players=1000')
+    'faction=dwarves&s_year=2013&e_year=2014&num_players=1000')
 
     assert response.status_code == 400
 
@@ -52,4 +53,23 @@ def test_winrates_oob(client):
 """PICK RATES TESTS"""
 
 def test_pickrates(client):
-    pass
+    # Pickrates uses same input validation as winrates (above)
+    # so safety is assumed here.
+    
+    
+    response = client.get('api/factions/faction-pickrate?' 
+    'faction=dwarves&s_year=2013&e_year=2014&num_players=3')
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data['faction'] == 'dwarves'
+    assert data['pickrate'] == 16.38
+    assert data['picked_games'] == 395
+    assert data['total_games'] == 2412
+
+
+
+    
+
