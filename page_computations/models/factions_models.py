@@ -13,10 +13,10 @@ game_data = pandas.read_csv(game_path)
 player_data = pandas.read_csv(player_path)
 
 
-def fetch_faction_winrate(faction: str, s_year: int, e_year: int, num_players: int):
+def fetch_faction_winrate(faction, s_year, e_year, num_players=None):
     filtered_data = game_data[
         (game_data['year'].between(int(s_year), int(e_year))) &
-        (game_data['num_players'] == int(num_players)) &
+        (game_data['num_players'] == int(num_players) if num_players is not None else True) &
         (game_data['all_factions'].apply(lambda row: faction in row))
     ]
 
@@ -32,10 +32,10 @@ def fetch_faction_winrate(faction: str, s_year: int, e_year: int, num_players: i
     }
 
 
-def fetch_faction_pickrate(faction: str, s_year: int, e_year: int, num_players: int):
+def fetch_faction_pickrate(faction, s_year, e_year, num_players=None):
     filtered_data = game_data[
         (game_data['year'].between(int(s_year), int(e_year))) &
-        (game_data['num_players'] == int(num_players))
+        (game_data['num_players'] == int(num_players) if num_players is not None else True)
     ]
 
     all_games = len(filtered_data)
@@ -51,7 +51,7 @@ def fetch_faction_pickrate(faction: str, s_year: int, e_year: int, num_players: 
         'picked_games': picked_games
     }
 
-def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players):
+def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players=None):
     '''
     for all factions Y
     games where faction X and Y were in play
@@ -60,11 +60,10 @@ def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players):
     user_faction = faction
     filtered_data = game_data[
         (game_data['year'].between(int(s_year), int(e_year))) &
-        (game_data['num_players'] == int(num_players))
+        (game_data['num_players'] == int(num_players) if num_players is not None else True)
     ]
 
     all_factions = filtered_data['winning_faction'].unique()
-    print(all_factions)
 
     win_rates_versus = {}
 
@@ -77,8 +76,9 @@ def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players):
         
         
         game_total = len(versus_data)
-        if game_total == 0:
+        if game_total == 0 or comp_faction == user_faction:
             continue
+        
         win_total = len(versus_data[(versus_data['winning_faction'] == user_faction)])
 
         win_rates_versus[comp_faction] = {
@@ -89,4 +89,76 @@ def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players):
 
     return win_rates_versus
 
-print(fetch_faction_wr_vs_others('dwarves', 2016, 2018, 3))
+
+def fetch_winrate_by_map(faction, s_year, e_year, num_players=None):
+    filtered_data = game_data[(game_data['year'].between(int(s_year), int(e_year))) &
+            (game_data['num_players'] == int(num_players) if num_players is not None else True)]
+    
+
+    wins_by_map = {}
+    all_maps = filtered_data['map'].unique()
+
+    for map_code in all_maps:
+
+        map_data = filtered_data[filtered_data['map'] == map_code] 
+
+        games_with_faction = map_data[map_data['all_factions'].apply(
+            lambda row: faction in row
+        )]
+
+        total_wins_on_map = games_with_faction[(games_with_faction['winning_faction'] == faction)]
+
+        total_games = len(games_with_faction)
+        total_wins = len(total_wins_on_map)
+
+        if total_games < 5:
+            continue
+
+        wins_by_map[map_code] = {
+            'win_rate': round((total_wins / total_games) * 100, 2),
+            'total_games': total_games,
+            'total_wins': total_wins
+        }
+
+    return wins_by_map
+
+
+def fetch_faction_vp(faction, s_year, e_year, num_players=None):
+    filtered_data = player_data[
+        (player_data['faction'] == faction) &
+        (player_data['year'].between(s_year, e_year)) &
+        (player_data['player_count'] == num_players if num_players is not None else True)]
+    
+
+    vps = {
+        'avg_vp': float(round(filtered_data['vp_scored'].mean(), 2)),
+        'max_vp': float(round(filtered_data['vp_scored'].max(), 2)),
+        'min_vp': float(round(filtered_data['vp_scored'].min(), 2)),
+        'vp_25_percentile': float(round(filtered_data['vp_scored'].quantile(0.25), 2)),
+        'vp_75_percentile': float(round(filtered_data['vp_scored'].quantile(0.75), 2)),
+
+    }
+
+    return vps
+
+
+def fetch_faction_vp_by_round(faction, s_year, e_year, num_players=None):
+    filtered_data = player_data[
+        (player_data['faction'] == faction) &
+        (player_data['year'].between(s_year, e_year)) &
+        (player_data['player_count'] == num_players if num_players is not None else True)
+    ]
+
+    all_vps_by_round = filtered_data['vp_by_round']
+
+
+    vp_df = pandas.DataFrame(columns=[1,2,3,4,5,6,7])
+
+
+
+
+
+    return vp_df
+
+
+print(fetch_faction_vp_by_round('dwarves', 2013, 2018))

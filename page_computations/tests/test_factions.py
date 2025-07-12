@@ -20,7 +20,7 @@ def test_winrates(client):
 
 def test_winrates_missing_param(client):
     response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2013&e_year=2014')
+    'faction=dwarves&s_year=2013&num_players=3')
 
     assert response.status_code == 400
     data = response.get_json()
@@ -45,12 +45,23 @@ def test_winrates_oob(client):
 
     data = response.get_json()
 
-    assert data['error'] == 'Parameter out of bounds.'
+    assert data['error'] == 'Player number filter out of bounds.'
+
+def test_num_player_ommited(client):
+    response = client.get('api/factions/faction-wr?' 
+    'faction=dwarves&s_year=2013&e_year=2014')
+
+    assert response.status_code == 200
+    data = response.get_json()
+
+    assert data['faction'] == 'dwarves'
+    assert data['total_games'] == 2068
 
 
 
 
-"""PICK RATES TESTS"""
+
+
 
 def test_pickrates(client):
     # Pickrates uses same input validation as winrates (above)
@@ -69,7 +80,37 @@ def test_pickrates(client):
     assert data['picked_games'] == 395
     assert data['total_games'] == 2412
 
+def test_wr_versus(client):
+    response = client.get('api/factions/faction-wr-versus?faction=dwarves&s_year=2013&' \
+    'e_year=2014&num_players=3')
 
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert 'dwarves' not in data.keys()
+    assert data['darklings']['win_rate'] == 25.98
+    assert data['darklings']['games_together'] == 127
+
+
+def test_wr_by_map(client):
+    response = client.get('api/factions/faction-wr-maps?faction=dwarves&s_year=2013&' \
+    'e_year=2014&num_players=3')
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+    
+    for map_code, values in data.items():
+        assert values['total_games'] > 0
+
+def test_faction_vp(client):
+    response = client.get('api/factions/faction-avg-vp?faction=dwarves&s_year=2013&'
+    'e_year=2014')
+
+    print(response.get_json())
+
+    assert response.status_code == 200
 
     
 
