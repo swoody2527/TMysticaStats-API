@@ -179,4 +179,23 @@ def get_faction_vp_by_round():
         return jsonify(error), 500
     
 
+    
+    
 
+@factions_bp.route('/faction-popularity-ot')
+def get_faction_vp_by_round():
+    faction = request.args.get('faction')
+    s_year = request.args.get('s_year')
+    e_year = request.args.get('e_year')
+    num_players = request.args.get('num_players')
+
+    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    if error:
+        return jsonify({'error': error}), 400
+    
+    try:
+        response = factions_models.fetch_faction_popularity_ot(*inputs)
+        return jsonify(response), 200
+    except Exception as e:
+        error = {'error': str(e)}
+        return jsonify(error), 500

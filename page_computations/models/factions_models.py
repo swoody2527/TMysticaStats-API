@@ -171,4 +171,30 @@ def fetch_faction_games_played(faction, s_year, e_year, num_players=None):
         'games_played': len(filtered_data)
     }
 
-print(fetch_faction_games_played('witches', 2013, 2025))
+
+def fetch_faction_popularity_ot(faction, s_year, e_year, num_players=None):
+    filtered_data = game_data[
+                (game_data['year'].between(s_year, e_year)) &
+                (game_data['player_count'] == num_players if num_players is not None else True)]
+    
+    pick_rates = {}
+
+    for year in range(s_year, e_year+1):
+        years_games = filtered_data[filtered_data['year'] == year]
+        print(years_games)
+        total_games = len(years_games)
+        
+        total_picks = len(years_games[years_games['all_factions'].apply(
+            lambda row: faction in row
+        )])
+
+        pick_rates[year] = {
+            'pick_rate': round((total_picks / total_games) * 100, 2),
+            'total_games': total_games,
+            'total_picks': total_picks
+        }
+        
+    return pick_rates
+
+
+print(fetch_faction_popularity_ot('auren', 2013, 2020))
