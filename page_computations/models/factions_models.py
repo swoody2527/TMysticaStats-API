@@ -150,15 +150,25 @@ def fetch_faction_vp_by_round(faction, s_year, e_year, num_players=None):
     ]
 
     all_vps_by_round = filtered_data['vp_by_round']
+    vp_df = pandas.DataFrame(ast.literal_eval(row) for row in all_vps_by_round)
 
 
-    vp_df = pandas.DataFrame(columns=[1,2,3,4,5,6,7])
+    vp_avgs = vp_df.mean().to_dict()
+    vp_avgs_round = {key: round(val) for key, val in vp_avgs.items()}
+
+    return vp_avgs_round
 
 
 
+def fetch_faction_games_played(faction, s_year, e_year, num_players=None):
+    filtered_data = player_data[(player_data['faction'] == faction) &
+            (player_data['year'].between(s_year, e_year)) &
+            (player_data['player_count'] == num_players if num_players is not None else True)]
+    
 
+    return {
+        'faction': faction,
+        'games_played': len(filtered_data)
+    }
 
-    return vp_df
-
-
-print(fetch_faction_vp_by_round('dwarves', 2013, 2018))
+print(fetch_faction_games_played('witches', 2013, 2025))

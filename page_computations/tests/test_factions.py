@@ -108,9 +108,20 @@ def test_faction_vp(client):
     response = client.get('api/factions/faction-avg-vp?faction=dwarves&s_year=2013&'
     'e_year=2014')
 
-    print(response.get_json())
+    assert response.status_code == 200
+
+
+def test_vp_by_round(client):
+    response = client.get('api/factions/faction-avg-vp-per-round?faction=dwarves&s_year=2013&'
+    'e_year=2014')
 
     assert response.status_code == 200
 
-    
+
+def test_games_played(client):
+    response = client.get('api/factions/faction-games-played?faction=dwarves&s_year=2013&'
+    'e_year=2014')
+
+    assert response.status_code == 200
+
 
