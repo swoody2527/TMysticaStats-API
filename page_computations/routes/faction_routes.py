@@ -161,7 +161,7 @@ def get_faction_vp_by_round():
     
 
 @factions_bp.route('/faction-games-played')
-def get_faction_vp_by_round():
+def get_faction_games_played():
     faction = request.args.get('faction')
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
@@ -183,7 +183,7 @@ def get_faction_vp_by_round():
     
 
 @factions_bp.route('/faction-popularity-ot')
-def get_faction_vp_by_round():
+def get_faction_pop_over_time():
     faction = request.args.get('faction')
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
@@ -195,6 +195,25 @@ def get_faction_vp_by_round():
     
     try:
         response = factions_models.fetch_faction_popularity_ot(*inputs)
+        return jsonify(response), 200
+    except Exception as e:
+        error = {'error': str(e)}
+        return jsonify(error), 500
+    
+
+@factions_bp.route('/wr-by-playercount')
+def get_faction_vp_by_playercount():
+    faction = request.args.get('faction')
+    s_year = request.args.get('s_year')
+    e_year = request.args.get('e_year')
+    num_players = request.args.get('num_players')
+
+    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    if error:
+        return jsonify({'error': error}), 400
+    
+    try:
+        response = factions_models.fetch_faction_wr_by_playercount(*inputs)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}

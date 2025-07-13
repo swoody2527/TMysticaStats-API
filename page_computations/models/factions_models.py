@@ -197,4 +197,27 @@ def fetch_faction_popularity_ot(faction, s_year, e_year, num_players=None):
     return pick_rates
 
 
-print(fetch_faction_popularity_ot('auren', 2013, 2020))
+def fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players=None):
+    filtered_data = game_data[(game_data['year'].between(int(s_year), int(e_year))) &
+                              (game_data['all_factions'].apply(lambda row: faction in row))]
+    
+    all_player_counts = sorted(filtered_data['num_players'].unique().tolist())
+    if 1 in all_player_counts:
+        all_player_counts.remove(1)
+
+    win_rates = {}
+    for count in all_player_counts:
+        total_games = filtered_data[filtered_data['num_players'] == count]
+        total_wins = total_games[total_games['winning_faction'] == faction]
+
+        win_rates[count] = {
+            'win_rate': round((len(total_wins) / len(total_games)) * 100, 2),
+            'total_games': len(total_games),
+            'total_wins': len(total_wins)
+        }
+
+    return win_rates
+
+
+
+print(fetch_faction_wr_by_playercount('darklings', 2013, 2020, 3))

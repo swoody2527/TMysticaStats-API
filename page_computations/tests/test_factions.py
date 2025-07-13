@@ -130,3 +130,9 @@ def test_pickrates(client):
     'e_year=2014')
 
     assert response.status_code == 200
+
+def test_pickrates(client):
+    response = client.get('api/factions/wr-by-playercount?faction=dwarves&s_year=2013&'
+    'e_year=2014')
+
+    assert response.status_code == 200
