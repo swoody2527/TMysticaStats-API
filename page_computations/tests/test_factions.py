@@ -58,6 +58,15 @@ def test_num_player_ommited(client):
     assert data['total_games'] == 2068
 
 
+def test_valid_faction(client):
+    response = client.get('api/factions/faction-wr?' 
+    'faction=INVALID&s_year=2013&e_year=2014')
+
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['error'] == 'Invalid faction choice.'
+
+
 
 
 
