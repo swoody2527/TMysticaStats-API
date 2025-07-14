@@ -50,8 +50,20 @@ def test_player_map_pickrate(client):
 
     assert response.status_code == 200
 
-def test_player_map_pickrate(client):
+def test_player_map_winrate(client):
     response = client.get('/api/maps/faction-winrate?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
+    's_year=2013&e_year=2014')
+
+    assert response.status_code == 200
+
+def test_player_map_avg_vp(client):
+    response = client.get('/api/maps/avg-vp-per-map?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
+    's_year=2013&e_year=2014')
+
+    assert response.status_code == 200
+
+def test_player_map_performance_diff(client):
+    response = client.get('/api/maps/performance-variation?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
     's_year=2013&e_year=2014')
 
     assert response.status_code == 200

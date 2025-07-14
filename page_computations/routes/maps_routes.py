@@ -96,7 +96,7 @@ def faction_map_pickrate():
     
 
 @maps_bp.route('/faction-winrate')
-def faction_map_winrate():
+def get_faction_map_winrate():
     
     map = request.args.get('map_id')
     s_year = request.args.get('s_year')
@@ -109,6 +109,42 @@ def faction_map_winrate():
 
     try:
         response = maps_models.fetch_winrates_on_map(*inputs)
+        return jsonify(response), 200
+    except Exception as e:
+        error = {'error': str(e)}
+        return jsonify(error), 500
+    
+@maps_bp.route('/avg-vp-per-map')
+def get_avg_vp_per_map():
+    
+    map = request.args.get('map_id')
+    s_year = request.args.get('s_year')
+    e_year = request.args.get('e_year')
+
+    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    if error:
+        return jsonify({'error': error}), 400
+
+    try:
+        response = maps_models.fetch_avg_vp_per_map(*inputs)
+        return jsonify(response), 200
+    except Exception as e:
+        error = {'error': str(e)}
+        return jsonify(error), 500
+    
+@maps_bp.route('/performance-variation')
+def get_performance_variation():
+    
+    map = request.args.get('map_id')
+    s_year = request.args.get('s_year')
+    e_year = request.args.get('e_year')
+
+    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    if error:
+        return jsonify({'error': error}), 400
+
+    try:
+        response = maps_models.fetch_avg_vp_per_map(*inputs)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
