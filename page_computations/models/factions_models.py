@@ -13,7 +13,7 @@ game_data = pandas.read_csv(game_path)
 player_data = pandas.read_csv(player_path)
 
 
-def fetch_faction_winrate(faction, s_year, e_year, num_players=None):
+def fetch_faction_winrate(s_year, e_year, faction, num_players=None):
     filtered_data = game_data[
         (game_data['year'].between(int(s_year), int(e_year))) &
         (game_data['num_players'] == int(num_players) if num_players is not None else True) &

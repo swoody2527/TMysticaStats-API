@@ -66,6 +66,15 @@ def test_valid_faction(client):
     data = response.get_json()
     assert data['error'] == 'Invalid faction choice.'
 
+def test_faction_omitted(client):
+    response = client.get('api/factions/faction-wr?' 
+    's_year=2013&e_year=2014&num_players=3')
+
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['error'] == 'Faction required for search.'
+
+
 
 
 
@@ -96,6 +105,7 @@ def test_wr_versus(client):
     assert response.status_code == 200
 
     data = response.get_json()
+    print(data)
 
     assert 'dwarves' not in data.keys()
     assert data['darklings']['win_rate'] == 25.98

@@ -23,7 +23,7 @@ def test_missing_param(client):
 
     assert response.status_code == 400
     data = response.get_json()
-    assert data['error'] == 'Missing 1 or more parameters for search.'
+    assert data['error'] == 'Map required for search.'
 
 def test_invalid_year(client):
      response = client.get('/api/maps/games-per-map?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \

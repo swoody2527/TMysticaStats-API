@@ -1,37 +1,9 @@
 from flask import Blueprint, jsonify, request
 from ..models import maps_models
+from ..utils import validate_inputs as val
 
 maps_bp = Blueprint('maps', __name__)
 
-def validate_maps_inputs(map, s_year, e_year):
-
-    if not all([map, s_year, e_year]):
-        return 'Missing 1 or more parameters for search.', None
-
-    valid_maps = [
-        '126fe960806d587c78546b30f1a90853b1ada468',
-        '95a66999127893f5925a5f591d54f8bcb9a670e6',
-        'be8f6ebf549404d015547152d5f2a1906ae8dd90',
-        'fdb13a13cd48b7a3c3525f27e4628ff6905aa5b1',
-        '91645cdb135773c2a7a50e5ca9cb18af54c664c4',
-        '2afadc63f4d81e850b7c16fb21a1dcd29658c392'
-
-    ]
-
-    if map not in valid_maps:
-        return 'Invalid map id.', None
-    
-    
-    try:
-        s_year = int(s_year)
-        e_year = int(e_year)
-    except ValueError:
-        return '1 or more invalid parameter type(s).', None
-
-    if s_year < 2013 or e_year > 2025:
-        return 'Parameter out of bounds.', None
-    
-    return None, [map, s_year, e_year]
 
 
 @maps_bp.route('/games-per-map')
@@ -41,13 +13,15 @@ def get_games_count_per_map():
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
 
-    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    error, inputs = val.validate_route_inputs(s_year, e_year, map, require_map=True)
+    print(inputs)
     if error:
         return jsonify({'error': error}), 400
 
 
     try:
-        response = maps_models.fetch_games_played_by_map(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = maps_models.fetch_games_played_by_map(s_year, e_year, map)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -62,13 +36,14 @@ def get_pcount_distribution():
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
 
-    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    error, inputs = val.validate_route_inputs(s_year, e_year, map, require_map=True)
     if error:
         return jsonify({'error': error}), 400
 
 
     try:
-        response = maps_models.fetch_avg_players_per_map(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = maps_models.fetch_avg_players_per_map(s_year, e_year, map)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -82,13 +57,14 @@ def faction_map_pickrate():
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
 
-    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    error, inputs = val.validate_route_inputs(s_year, e_year, map, require_map=True)
     if error:
         return jsonify({'error': error}), 400
 
 
     try:
-        response = maps_models.fetch_pr_on_map(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = maps_models.fetch_pr_on_map(s_year, e_year, map)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -102,13 +78,14 @@ def get_faction_map_winrate():
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
 
-    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    error, inputs = val.validate_route_inputs(s_year, e_year, map, require_map=True)
     if error:
         return jsonify({'error': error}), 400
 
 
     try:
-        response = maps_models.fetch_winrates_on_map(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = maps_models.fetch_winrates_on_map(s_year, e_year, map)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -121,12 +98,13 @@ def get_avg_vp_per_map():
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
 
-    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    error, inputs = val.validate_route_inputs(s_year, e_year, map, require_map=True)
     if error:
         return jsonify({'error': error}), 400
 
     try:
-        response = maps_models.fetch_avg_vp_per_map(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = maps_models.fetch_avg_vp_per_map(s_year, e_year, map)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -139,12 +117,13 @@ def get_performance_variation():
     s_year = request.args.get('s_year')
     e_year = request.args.get('e_year')
 
-    error, inputs = validate_maps_inputs(map, s_year, e_year)
+    error, inputs = val.validate_route_inputs(s_year, e_year, map, require_map=True)
     if error:
         return jsonify({'error': error}), 400
 
     try:
-        response = maps_models.fetch_avg_vp_per_map(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = maps_models.fetch_avg_vp_per_map(s_year, e_year, map)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}

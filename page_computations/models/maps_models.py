@@ -14,7 +14,7 @@ player_data = pandas.read_csv(player_path)
 
 
 
-def fetch_games_played_by_map(map, s_year, e_year):
+def fetch_games_played_by_map(s_year, e_year, map):
     filtered_data = game_data[(game_data['year'].between(s_year, e_year)) &
                               (game_data['map'] == map)]
     
@@ -25,7 +25,7 @@ def fetch_games_played_by_map(map, s_year, e_year):
 
 
 
-def fetch_avg_players_per_map(map, s_year, e_year):
+def fetch_avg_players_per_map(s_year, e_year, map):
     filtered_data = game_data[game_data['year'].between(s_year, e_year)]
 
     all_maps = filtered_data['map'].value_counts()
@@ -49,7 +49,7 @@ def fetch_avg_players_per_map(map, s_year, e_year):
 
 
 
-def fetch_pr_on_map(map, s_year, e_year):
+def fetch_pr_on_map(s_year, e_year, map):
     filtered_data = game_data[(game_data['year'].between(s_year, e_year)) &
                                   (game_data['map'] == map)]
     
@@ -70,7 +70,7 @@ def fetch_pr_on_map(map, s_year, e_year):
     return pick_rates
 
 
-def fetch_winrates_on_map(map, s_year, e_year):
+def fetch_winrates_on_map(s_year, e_year, map):
     filtered_data = game_data[(game_data['year'].between(s_year, e_year)) &
                                       (game_data['map'] == map)]
     
@@ -94,7 +94,7 @@ def fetch_winrates_on_map(map, s_year, e_year):
 
 
 
-def fetch_avg_vp_per_map(map, s_year, e_year):
+def fetch_avg_vp_per_map(s_year, e_year, map):
     filtered_data = player_data[(player_data['year'].between(s_year, e_year)) &
                                           (player_data['map'] == map)]
     
@@ -114,7 +114,7 @@ def fetch_avg_vp_per_map(map, s_year, e_year):
 
 
 
-def fetch_performance_variation(map, s_year, e_year):
+def fetch_performance_variation(s_year, e_year, map):
     non_map_filtered_data = game_data[(game_data['year'].between(s_year, e_year))]
     
     map_winrates = fetch_winrates_on_map(map, s_year, e_year)
@@ -143,4 +143,4 @@ def fetch_performance_variation(map, s_year, e_year):
 
 
 
-print(fetch_performance_variation('be8f6ebf549404d015547152d5f2a1906ae8dd90', 2013, 2025))
+print(fetch_games_played_by_map(2013, 2014, 'be8f6ebf549404d015547152d5f2a1906ae8dd90'))

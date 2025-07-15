@@ -1,47 +1,11 @@
 from flask import Blueprint, jsonify, request
 from ..models import factions_models
+from ..utils import validate_inputs as val
 
 
 factions_bp = Blueprint('factions', __name__)
 
 
-
-def validate_faction_inputs(faction, s_year, e_year, num_players=None):
-
-    valid_factions = [
-        "auren", "witches",
-        "mermaids", "swarmlings",
-        "halflings", "cultists",
-        "engineers", "dwarves",
-        "alchemists", "chaosmagicians",
-        "fakirs", "nomads",
-        "giants", "darklings",
-        "icemaidens", "yetis",
-        "acolytes", "dragonlords",
-        "shapeshifters", "riverwalkers"
-        ]
-
-    if faction not in valid_factions:
-        return 'Invalid faction choice.', None
-
-
-    if not all([faction, s_year, e_year]):
-        return 'Missing 1 or more parameters for search.', None
-    
-    try:
-        s_year = int(s_year)
-        e_year = int(e_year)
-        num_players = int(num_players) if num_players is not None else None
-    except ValueError:
-        return '1 or more invalid parameter type(s).', None
-    
-    if num_players and num_players > 6:
-        return 'Player number filter out of bounds.', None 
-    
-    if s_year < 2013 or e_year > 2025:
-        return 'Parameter out of bounds.', None
-    
-    return None, [faction, s_year, e_year, num_players]
 
 @factions_bp.route('/faction-wr')
 def get_strongest_faction_by_name():
@@ -52,13 +16,14 @@ def get_strongest_faction_by_name():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     
     try:
-        response = factions_models.fetch_faction_winrate(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_winrate(s_year, e_year, faction, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -72,12 +37,13 @@ def get_faction_pick_rates():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_faction_pickrate(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_pickrate(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -92,12 +58,13 @@ def get_faction_wr_versus():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_faction_wr_vs_others(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_wr_vs_others(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -111,12 +78,13 @@ def get_faction_wr_by_map():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_winrate_by_map(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_winrate_by_map(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -129,12 +97,13 @@ def get_faction_avg_vp():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_faction_vp(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_vp(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -148,12 +117,13 @@ def get_faction_vp_by_round():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_faction_vp_by_round(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_vp_by_round(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -167,12 +137,13 @@ def get_faction_games_played():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_faction_games_played(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_games_played(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -189,12 +160,13 @@ def get_faction_pop_over_time():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_faction_popularity_ot(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_popularity_ot(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
@@ -208,12 +180,13 @@ def get_faction_vp_by_playercount():
     e_year = request.args.get('e_year')
     num_players = request.args.get('num_players')
 
-    error, inputs = validate_faction_inputs(faction, s_year, e_year, num_players)
+    error, inputs = val.validate_route_inputs(s_year, e_year, faction=faction, num_players=num_players, require_faction=True)
     if error:
         return jsonify({'error': error}), 400
     
     try:
-        response = factions_models.fetch_faction_wr_by_playercount(*inputs)
+        s_year, e_year, map, num_players, faction = inputs
+        response = factions_models.fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
