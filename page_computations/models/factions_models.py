@@ -1,16 +1,9 @@
 import pandas, pathlib, ast, os
+from ..utils import data_loader as dl
 
-ROOT_DIR = pathlib.Path(__file__).resolve().parents[2]
-DATA_DIR = ROOT_DIR / 'data'
 
-ENV = os.getenv('APP_ENV', 'prod')
-print(ENV)
 
-game_path = DATA_DIR / f"game{'_test_data' if ENV == 'test' else '_data'}.csv"
-player_path = DATA_DIR / f"player{'_test_data' if ENV == 'test' else '_data'}.csv"
-
-game_data = pandas.read_csv(game_path)
-player_data = pandas.read_csv(player_path)
+game_data, player_data = dl.load_game_and_player_data()
 
 
 def fetch_faction_winrate(s_year, e_year, faction, num_players=None):
