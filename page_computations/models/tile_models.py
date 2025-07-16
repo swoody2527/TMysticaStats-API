@@ -1,4 +1,4 @@
-import duckdb, pandas, pathlib, ast, os
+import pandas, pathlib, ast, os
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT_DIR / 'data'
