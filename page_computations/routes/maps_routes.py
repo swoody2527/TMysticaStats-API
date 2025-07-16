@@ -14,7 +14,6 @@ def get_games_count_per_map():
     e_year = request.args.get('e_year')
 
     error, inputs = val.validate_route_inputs(s_year, e_year, map, require_map=True)
-    print(inputs)
     if error:
         return jsonify({'error': error}), 400
 
