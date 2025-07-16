@@ -96,4 +96,3 @@ def fetch_played_games_ot(s_year, e_year):
         games_per_year[year] = len(year_data)
 
     return games_per_year
-print(fetch_played_games_ot(2015, 2020))

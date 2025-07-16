@@ -219,5 +219,3 @@ def fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players=None):
     return win_rates
 
 
-
-print(fetch_faction_wr_by_playercount('darklings', 2013, 2020, 3))

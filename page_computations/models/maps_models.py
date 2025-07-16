@@ -140,7 +140,3 @@ def fetch_performance_variation(s_year, e_year, map):
     return winrate_diff
 
 
-
-
-
-print(fetch_games_played_by_map(2013, 2014, 'be8f6ebf549404d015547152d5f2a1906ae8dd90'))

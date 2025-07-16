@@ -136,6 +136,4 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year,
 
 
 
-#print(fetch_vp_gained_by_scoring_tile(2015, 2020, faction='auren'))
-
 

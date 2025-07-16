@@ -1,5 +1,5 @@
 
-
+from flask import Flask
 from page_computations.routes.faction_routes import factions_bp
 from page_computations.routes.maps_routes import maps_bp
 from page_computations.routes.tile_routes import tiles_bp
