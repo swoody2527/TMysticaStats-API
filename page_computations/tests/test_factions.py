@@ -105,7 +105,6 @@ def test_wr_versus(client):
     assert response.status_code == 200
 
     data = response.get_json()
-    print(data)
 
     assert 'dwarves' not in data.keys()
     assert data['darklings']['win_rate'] == 25.98
