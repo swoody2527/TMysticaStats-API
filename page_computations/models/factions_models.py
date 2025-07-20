@@ -1,12 +1,9 @@
 import pandas, pathlib, ast, os
-from ..utils import data_loader as dl
+from ..utils import data_store as ds
 
 
-
-game_data, player_data = dl.load_game_and_player_data()
-
-
-def fetch_faction_winrate(s_year, e_year, faction, num_players=None):
+def fetch_faction_winrate(faction, s_year, e_year, num_players=None):
+    game_data = ds.game_data
     filtered_data = game_data[
         (game_data['year'].between(int(s_year), int(e_year))) &
         (game_data['num_players'] == int(num_players) if num_players is not None else True) &
@@ -14,7 +11,6 @@ def fetch_faction_winrate(s_year, e_year, faction, num_players=None):
     ]
 
     all_games = len(filtered_data)
-
     all_wins = len(filtered_data[(filtered_data['winning_faction'] == faction)])
 
     return {
@@ -26,13 +22,13 @@ def fetch_faction_winrate(s_year, e_year, faction, num_players=None):
 
 
 def fetch_faction_pickrate(faction, s_year, e_year, num_players=None):
+    game_data = ds.game_data
     filtered_data = game_data[
         (game_data['year'].between(int(s_year), int(e_year))) &
         (game_data['num_players'] == int(num_players) if num_players is not None else True)
     ]
 
     all_games = len(filtered_data)
-
     picked_games = len(filtered_data[
         (filtered_data['all_factions'].apply(lambda row: faction in row))
     ])
@@ -44,12 +40,9 @@ def fetch_faction_pickrate(faction, s_year, e_year, num_players=None):
         'picked_games': picked_games
     }
 
+
 def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players=None):
-    '''
-    for all factions Y
-    games where faction X and Y were in play
-    games where faction X won
-    '''
+    game_data = ds.game_data
     user_faction = faction
     filtered_data = game_data[
         (game_data['year'].between(int(s_year), int(e_year))) &
@@ -57,7 +50,6 @@ def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players=None):
     ]
 
     all_factions = filtered_data['winning_faction'].unique()
-
     win_rates_versus = {}
 
     for comp_faction in all_factions:
@@ -65,13 +57,12 @@ def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players=None):
             filtered_data['all_factions'].apply(
                 lambda row: user_faction in row and comp_faction in row
             )
-]
-        
-        
+        ]
+
         game_total = len(versus_data)
         if game_total == 0 or comp_faction == user_faction:
             continue
-        
+
         win_total = len(versus_data[(versus_data['winning_faction'] == user_faction)])
 
         win_rates_versus[comp_faction] = {
@@ -84,21 +75,20 @@ def fetch_faction_wr_vs_others(faction, s_year, e_year, num_players=None):
 
 
 def fetch_winrate_by_map(faction, s_year, e_year, num_players=None):
-    filtered_data = game_data[(game_data['year'].between(int(s_year), int(e_year))) &
-            (game_data['num_players'] == int(num_players) if num_players is not None else True)]
-    
+    game_data = ds.game_data
+    filtered_data = game_data[
+        (game_data['year'].between(int(s_year), int(e_year))) &
+        (game_data['num_players'] == int(num_players) if num_players is not None else True)
+    ]
 
     wins_by_map = {}
     all_maps = filtered_data['map'].unique()
 
     for map_code in all_maps:
-
-        map_data = filtered_data[filtered_data['map'] == map_code] 
-
+        map_data = filtered_data[filtered_data['map'] == map_code]
         games_with_faction = map_data[map_data['all_factions'].apply(
             lambda row: faction in row
         )]
-
         total_wins_on_map = games_with_faction[(games_with_faction['winning_faction'] == faction)]
 
         total_games = len(games_with_faction)
@@ -117,11 +107,12 @@ def fetch_winrate_by_map(faction, s_year, e_year, num_players=None):
 
 
 def fetch_faction_vp(faction, s_year, e_year, num_players=None):
+    player_data = ds.player_data
     filtered_data = player_data[
         (player_data['faction'] == faction) &
         (player_data['year'].between(s_year, e_year)) &
-        (player_data['num_players'] == num_players if num_players is not None else True)]
-    
+        (player_data['num_players'] == num_players if num_players is not None else True)
+    ]
 
     vps = {
         'avg_vp': float(round(filtered_data['vp_scored'].mean(), 2)),
@@ -129,13 +120,13 @@ def fetch_faction_vp(faction, s_year, e_year, num_players=None):
         'min_vp': float(round(filtered_data['vp_scored'].min(), 2)),
         'vp_25_percentile': float(round(filtered_data['vp_scored'].quantile(0.25), 2)),
         'vp_75_percentile': float(round(filtered_data['vp_scored'].quantile(0.75), 2)),
-
     }
 
     return vps
 
 
 def fetch_faction_vp_by_round(faction, s_year, e_year, num_players=None):
+    player_data = ds.player_data
     filtered_data = player_data[
         (player_data['faction'] == faction) &
         (player_data['year'].between(s_year, e_year)) &
@@ -145,19 +136,19 @@ def fetch_faction_vp_by_round(faction, s_year, e_year, num_players=None):
     all_vps_by_round = filtered_data['vp_by_round']
     vp_df = pandas.DataFrame(ast.literal_eval(row) for row in all_vps_by_round)
 
-
     vp_avgs = vp_df.mean().to_dict()
     vp_avgs_round = {key: round(val) for key, val in vp_avgs.items()}
 
     return vp_avgs_round
 
 
-
 def fetch_faction_games_played(faction, s_year, e_year, num_players=None):
-    filtered_data = player_data[(player_data['faction'] == faction) &
-            (player_data['year'].between(s_year, e_year)) &
-            (player_data['num_players'] == num_players if num_players is not None else True)]
-    
+    player_data = ds.player_data
+    filtered_data = player_data[
+        (player_data['faction'] == faction) &
+        (player_data['year'].between(s_year, e_year)) &
+        (player_data['num_players'] == num_players if num_players is not None else True)
+    ]
 
     return {
         'faction': faction,
@@ -166,17 +157,18 @@ def fetch_faction_games_played(faction, s_year, e_year, num_players=None):
 
 
 def fetch_faction_popularity_ot(faction, s_year, e_year, num_players=None):
+    game_data = ds.game_data
     filtered_data = game_data[
-                (game_data['year'].between(s_year, e_year)) &
-                (game_data['num_players'] == num_players if num_players is not None else True)]
-    
+        (game_data['year'].between(s_year, e_year)) &
+        (game_data['num_players'] == num_players if num_players is not None else True)
+    ]
+
     pick_rates = {}
 
-    for year in range(s_year, e_year+1):
+    for year in range(s_year, e_year + 1):
         years_games = filtered_data[filtered_data['year'] == year]
-        print(years_games)
         total_games = len(years_games)
-        
+
         total_picks = len(years_games[years_games['all_factions'].apply(
             lambda row: faction in row
         )])
@@ -186,14 +178,17 @@ def fetch_faction_popularity_ot(faction, s_year, e_year, num_players=None):
             'total_games': total_games,
             'total_picks': total_picks
         }
-        
+
     return pick_rates
 
 
 def fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players=None):
-    filtered_data = game_data[(game_data['year'].between(int(s_year), int(e_year))) &
-                              (game_data['all_factions'].apply(lambda row: faction in row))]
-    
+    game_data = ds.game_data
+    filtered_data = game_data[
+        (game_data['year'].between(int(s_year), int(e_year))) &
+        (game_data['all_factions'].apply(lambda row: faction in row))
+    ]
+
     all_player_counts = sorted(filtered_data['num_players'].unique().tolist())
     if 1 in all_player_counts:
         all_player_counts.remove(1)
@@ -210,5 +205,3 @@ def fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players=None):
         }
 
     return win_rates
-
-

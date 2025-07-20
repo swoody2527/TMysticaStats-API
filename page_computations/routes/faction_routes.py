@@ -23,7 +23,7 @@ def get_strongest_faction_by_name():
     
     try:
         s_year, e_year, map, num_players, faction = inputs
-        response = factions_models.fetch_faction_winrate(s_year, e_year, faction, num_players)
+        response = factions_models.fetch_faction_winrate(faction, s_year, e_year, num_players)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}

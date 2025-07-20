@@ -1,5 +1,3 @@
-import pytest
-from app import app
 
 # TEST DATA RUNS FROM 2013 - 2014
 
@@ -143,13 +141,13 @@ def test_games_played(client):
     assert response.status_code == 200
 
 
-def test_pickrates(client):
+def test_games_played(client):
     response = client.get('api/factions/faction-games-played?faction=dwarves&s_year=2013&'
     'e_year=2014')
 
     assert response.status_code == 200
 
-def test_pickrates(client):
+def test_wr_playercount(client):
     response = client.get('api/factions/wr-by-playercount?faction=dwarves&s_year=2013&'
     'e_year=2014')
 
