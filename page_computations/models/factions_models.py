@@ -212,5 +212,3 @@ def fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players=None):
     return win_rates
 
 
-print(fetch_faction_games_played('dwarves', 2017, 2022, 4))
-
