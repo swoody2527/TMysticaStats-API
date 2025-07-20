@@ -120,7 +120,7 @@ def fetch_faction_vp(faction, s_year, e_year, num_players=None):
     filtered_data = player_data[
         (player_data['faction'] == faction) &
         (player_data['year'].between(s_year, e_year)) &
-        (player_data['player_count'] == num_players if num_players is not None else True)]
+        (player_data['num_players'] == num_players if num_players is not None else True)]
     
 
     vps = {
@@ -139,7 +139,7 @@ def fetch_faction_vp_by_round(faction, s_year, e_year, num_players=None):
     filtered_data = player_data[
         (player_data['faction'] == faction) &
         (player_data['year'].between(s_year, e_year)) &
-        (player_data['player_count'] == num_players if num_players is not None else True)
+        (player_data['num_players'] == num_players if num_players is not None else True)
     ]
 
     all_vps_by_round = filtered_data['vp_by_round']
@@ -156,7 +156,7 @@ def fetch_faction_vp_by_round(faction, s_year, e_year, num_players=None):
 def fetch_faction_games_played(faction, s_year, e_year, num_players=None):
     filtered_data = player_data[(player_data['faction'] == faction) &
             (player_data['year'].between(s_year, e_year)) &
-            (player_data['player_count'] == num_players if num_players is not None else True)]
+            (player_data['num_players'] == num_players if num_players is not None else True)]
     
 
     return {
@@ -168,7 +168,7 @@ def fetch_faction_games_played(faction, s_year, e_year, num_players=None):
 def fetch_faction_popularity_ot(faction, s_year, e_year, num_players=None):
     filtered_data = game_data[
                 (game_data['year'].between(s_year, e_year)) &
-                (game_data['player_count'] == num_players if num_players is not None else True)]
+                (game_data['num_players'] == num_players if num_players is not None else True)]
     
     pick_rates = {}
 
@@ -211,4 +211,6 @@ def fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players=None):
 
     return win_rates
 
+
+print(fetch_faction_games_played('dwarves', 2017, 2022, 4))
 

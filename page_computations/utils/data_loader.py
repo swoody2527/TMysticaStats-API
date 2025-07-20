@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def load_game_and_player_data():
-    
     env = os.getenv('APP_ENV', 'prod')
 
     if env == 'test':
@@ -16,9 +15,16 @@ def load_game_and_player_data():
         player_url = os.getenv('PLAYER_DATA_URL')
 
     if not game_url or not player_url:
-        raise ValueError("Missing one or more Google Drive data URLs in environment variables.")
+        raise ValueError("Missing one or more data URLs in environment variables.")
+    
+
+    print("Using game URL:", game_url)
+    print("Using player URL:", player_url)
+
 
     game_data = pd.read_csv(game_url)
     player_data = pd.read_csv(player_url)
+
+    print(player_data.head())
 
     return game_data, player_data
