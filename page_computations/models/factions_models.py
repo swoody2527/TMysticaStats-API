@@ -168,7 +168,7 @@ def fetch_faction_games_played(faction, s_year, e_year, num_players=None):
 def fetch_faction_popularity_ot(faction, s_year, e_year, num_players=None):
     filtered_data = game_data[
                 (game_data['year'].between(s_year, e_year)) &
-                (game_data['player_count'] == num_players if num_players is not None else True)]
+                (game_data['num_players'] == num_players if num_players is not None else True)]
     
     pick_rates = {}
 
