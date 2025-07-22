@@ -122,7 +122,7 @@ def get_performance_variation():
 
     try:
         s_year, e_year, map, num_players, faction = inputs
-        response = maps_models.fetch_avg_vp_per_map(s_year, e_year, map)
+        response = maps_models.fetch_performance_variation(s_year, e_year, map)
         return jsonify(response), 200
     except Exception as e:
         error = {'error': str(e)}
