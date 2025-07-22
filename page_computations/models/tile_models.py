@@ -7,7 +7,7 @@ def fetch_common_score_tile_order(s_year, e_year, map=None, num_players=None, fa
     game_data = ds.game_data
     filtered_data = game_data[(game_data['year'].between(s_year, e_year)) &
                               (game_data['map'] == map if map is not None else True) &
-                              (game_data['num_player'] == num_players if num_players is not None else True)]
+                              (game_data['num_players'] == num_players if num_players is not None else True)]
 
     s_tiles_data = filtered_data['scoring_tiles']
     s_tiles_frame = pandas.DataFrame(ast.literal_eval(row) for row in s_tiles_data)
@@ -21,7 +21,7 @@ def fetch_popular_bonus_tiles_by_round(s_year, e_year, map=None, num_players=Non
     player_data = ds.player_data
     filtered_data = player_data[(player_data['year'].between(s_year, e_year)) &
                                 (player_data['map'] == map if map is not None else True) &
-                                (player_data['num_player'] == num_players if num_players is not None else True) &
+                                (player_data['num_players'] == num_players if num_players is not None else True) &
                                 (player_data['faction'] == faction if faction is not None else True)]
 
     b_tiles_frame = pandas.DataFrame(ast.literal_eval(row) for row in filtered_data['bonus_tiles'])
@@ -35,7 +35,7 @@ def fetch_favor_tiles_by_faction(s_year, e_year, map=None, num_players=None, fac
     player_data = ds.player_data
     filtered_data = player_data[(player_data['year'].between(s_year, e_year)) &
                                 (player_data['map'] == map if map is not None else True) &
-                                (player_data['num_player'] == num_players if num_players is not None else True)]
+                                (player_data['num_players'] == num_players if num_players is not None else True)]
 
     all_factions = filtered_data['faction'].unique()
     favour_counts = {}
@@ -55,7 +55,7 @@ def fetch_town_tiles_by_faction(s_year, e_year, map=None, num_players=None, fact
     player_data = ds.player_data
     filtered_data = player_data[(player_data['year'].between(s_year, e_year)) &
                                 (player_data['map'] == map if map is not None else True) &
-                                (player_data['num_player'] == num_players if num_players is not None else True)]
+                                (player_data['num_players'] == num_players if num_players is not None else True)]
 
     all_factions = filtered_data['faction'].unique()
     town_counts = {}
