@@ -12,7 +12,7 @@ def fetch_common_score_tile_order(s_year, e_year, map=None, num_players=None, fa
     s_tiles_data = filtered_data['scoring_tiles']
     s_tiles_frame = pandas.DataFrame(ast.literal_eval(row) for row in s_tiles_data)
 
-    counts = {f'round{col}': s_tiles_frame[col].value_counts().to_dict() for col in s_tiles_frame.columns}
+    counts = {f'round{col}': s_tiles_frame[col].value_counts(normalize=True).mul(100).round(2).to_dict() for col in s_tiles_frame.columns}
 
     return counts
 
@@ -26,7 +26,7 @@ def fetch_popular_bonus_tiles_by_round(s_year, e_year, map=None, num_players=Non
 
     b_tiles_frame = pandas.DataFrame(ast.literal_eval(row) for row in filtered_data['bonus_tiles'])
 
-    counts = {f'round{col}': b_tiles_frame[col].value_counts().to_dict() for col in b_tiles_frame.columns}
+    counts = {f'round{col}': b_tiles_frame[col].value_counts(normalize=True).mul(100).round(2).to_dict() for col in b_tiles_frame.columns}
 
     return counts
 
