@@ -45,7 +45,16 @@ def fetch_favor_tiles_by_faction(s_year, e_year, map=None, num_players=None, fac
         faction_favours = faction_data['favour_tiles']
         faction_frame = pandas.DataFrame(ast.literal_eval(row) for row in faction_favours)
 
-        counts = faction_frame.apply(pandas.Series.value_counts).sum(axis=1).sort_values(ascending=False)
+        total = faction_frame.size
+        
+        counts = (
+            faction_frame.apply(pandas.Series.value_counts)
+            .sum(axis=1)
+            .div(total)
+            .mul(100)
+            .round(2)
+            .sort_values(ascending=False)
+        )
         favour_counts[faction] = counts.to_dict()
 
     return favour_counts
@@ -64,8 +73,16 @@ def fetch_town_tiles_by_faction(s_year, e_year, map=None, num_players=None, fact
         faction_data = filtered_data[filtered_data['faction'] == faction]
         faction_favours = faction_data['town_tiles']
         faction_frame = pandas.DataFrame(ast.literal_eval(row) for row in faction_favours)
-
-        counts = faction_frame.apply(pandas.Series.value_counts).sum(axis=1).sort_values(ascending=False)
+        total = faction_frame.size
+        
+        counts = (
+            faction_frame.apply(pandas.Series.value_counts)
+            .sum(axis=1)
+            .div(total)
+            .mul(100)
+            .round(2)
+            .sort_values(ascending=False)
+        )
         town_counts[faction] = counts.to_dict()
 
     return town_counts
