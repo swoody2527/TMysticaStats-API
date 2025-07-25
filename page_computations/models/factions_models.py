@@ -190,8 +190,10 @@ def fetch_faction_wr_by_playercount(faction, s_year, e_year, num_players=None):
     ]
 
     all_player_counts = sorted(filtered_data['num_players'].unique().tolist())
-    if 1 in all_player_counts:
-        all_player_counts.remove(1)
+    
+    for count in [1, 6, 7]:
+        if count in all_player_counts:
+            all_player_counts.remove(count)
 
     win_rates = {}
     for count in all_player_counts:
