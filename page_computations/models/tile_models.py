@@ -96,11 +96,11 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
     game_data = ds.game_data
 
     players_filtered = player_data[(player_data['year'].between(s_year, e_year)) &
-                                   (player_data['map'] == map if map else True) &
+                                   (player_data['map'] == map if map is not None else True) &
                                    (player_data['num_players'] == num_players if num_players is not None else True) &
-                                   (player_data['faction'] == faction if faction is not None else True)].copy()
+                                   (player_data['faction'] == faction if faction is not None else True)]
 
-    games_filtered = game_data[['game_id', 'scoring_tiles']].copy()
+    games_filtered = game_data[['game_id', 'scoring_tiles']]
     df = players_filtered.merge(games_filtered, on='game_id', how='inner')
 
     df['vp_by_round'] = df['vp_by_round'].apply(lambda row: ast.literal_eval(row))
