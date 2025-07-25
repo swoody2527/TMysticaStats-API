@@ -1,4 +1,4 @@
-import pandas, pathlib, ast, os
+import pandas, pathlib, ast, os, json
 from ..utils import data_store as ds
 
 
@@ -89,8 +89,9 @@ def fetch_town_tiles_by_faction(s_year, e_year, map=None, num_players=None, fact
 
 
 def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, faction=None):
-    player_data = ds.player_data
-    game_data = ds.game_data[['game_id', 'scoring_tiles']] 
+    player_cols = ['game_id', 'year', 'map', 'num_players', 'faction', 'vp_by_round']
+    player_data = ds.player_data[player_cols]
+    game_data = ds.game_data[['game_id', 'scoring_tiles']]
 
     players_filtered = player_data[player_data['year'].between(s_year, e_year)]
 
@@ -101,20 +102,25 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
     if faction is not None:
         players_filtered = players_filtered[players_filtered['faction'] == faction]
 
+    players_filtered = players_filtered[['game_id', 'faction', 'vp_by_round']]
+
     df = players_filtered.merge(game_data, on='game_id', how='inner')
 
 
-    df['vp_by_round'] = df['vp_by_round'].apply(ast.literal_eval)
-    df['scoring_tiles'] = df['scoring_tiles'].apply(ast.literal_eval)
+    df['vp_by_round'] = df['vp_by_round'].map(ast.literal_eval)
+    df['scoring_tiles'] = df['scoring_tiles'].map(ast.literal_eval)
 
     df = df[df['vp_by_round'].apply(lambda x: isinstance(x, list) and len(x) >= 6)]
     df = df[df['scoring_tiles'].apply(lambda x: isinstance(x, list) and len(x) >= 6)]
 
+    if df.empty:
+        return {}
+
     rows = []
     for _, row in df.iterrows():
+        vp_list = row['vp_by_round']
+        tiles = row['scoring_tiles']
         for i in range(6):
-            vp_list = row['vp_by_round']
-            tiles = row['scoring_tiles']
             vp_gain = vp_list[i] if i == 0 else vp_list[i] - vp_list[i - 1]
             rows.append({
                 'faction': row['faction'],
