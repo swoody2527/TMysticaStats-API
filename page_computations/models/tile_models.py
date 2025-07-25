@@ -102,7 +102,11 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
     if faction is not None:
         players_filtered = players_filtered[players_filtered['faction'] == faction]
 
-    players_filtered = players_filtered[['game_id', 'faction', 'vp_by_round']]
+    players_filtered = (
+        players_filtered
+        .groupby('year', group_keys=False)
+        .apply(lambda x: x.sample(frac=0.5, random_state=42) if len(x) > 1 else x)
+    )
 
     df = players_filtered.merge(game_data, on='game_id', how='inner')
 
