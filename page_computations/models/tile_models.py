@@ -89,36 +89,40 @@ def fetch_town_tiles_by_faction(s_year, e_year, map=None, num_players=None, fact
 
 
 def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, faction=None):
-    import ast
-    import pandas as pd
-
     player_data = ds.player_data
-    game_data = ds.game_data
+    game_data = ds.game_data[['game_id', 'scoring_tiles']] 
 
-    players_filtered = player_data[(player_data['year'].between(s_year, e_year)) &
-                                   (player_data['map'] == map if map is not None else True) &
-                                   (player_data['num_players'] == num_players if num_players is not None else True) &
-                                   (player_data['faction'] == faction if faction is not None else True)]
+    players_filtered = player_data[player_data['year'].between(s_year, e_year)].copy()
 
-    games_filtered = game_data[['game_id', 'scoring_tiles']]
-    df = players_filtered.merge(games_filtered, on='game_id', how='inner')
+    if map is not None:
+        players_filtered = players_filtered[players_filtered['map'] == map]
+    if num_players is not None:
+        players_filtered = players_filtered[players_filtered['num_players'] == num_players]
+    if faction is not None:
+        players_filtered = players_filtered[players_filtered['faction'] == faction]
 
-    df['vp_by_round'] = df['vp_by_round'].apply(lambda row: ast.literal_eval(row))
-    df['scoring_tiles'] = df['scoring_tiles'].apply(lambda row: ast.literal_eval(row))
+    df = players_filtered.merge(game_data, on='game_id', how='inner')
 
-    df = df[df['vp_by_round'].apply(lambda row: isinstance(row, list) and len(row) >= 6)]
-    df = df[df['scoring_tiles'].apply(lambda row: isinstance(row, list) and len(row) >= 6)]
 
-    df_expanded = df.apply(lambda row: [
-        {
-            'faction': row['faction'],
-            'scoring_tile': row['scoring_tiles'][i],
-            'vp_gain': row['vp_by_round'][i] if i == 0 else row['vp_by_round'][i] - row['vp_by_round'][i - 1]
-        }
-        for i in range(6)
-    ], axis=1).explode()
+    df['vp_by_round'] = df['vp_by_round'].apply(ast.literal_eval)
+    df['scoring_tiles'] = df['scoring_tiles'].apply(ast.literal_eval)
 
-    vp_df = pd.DataFrame([d for d in df_expanded])
+    df = df[df['vp_by_round'].apply(lambda x: isinstance(x, list) and len(x) >= 6)]
+    df = df[df['scoring_tiles'].apply(lambda x: isinstance(x, list) and len(x) >= 6)]
+
+    rows = []
+    for _, row in df.iterrows():
+        for i in range(6):
+            vp_list = row['vp_by_round']
+            tiles = row['scoring_tiles']
+            vp_gain = vp_list[i] if i == 0 else vp_list[i] - vp_list[i - 1]
+            rows.append({
+                'faction': row['faction'],
+                'scoring_tile': tiles[i],
+                'vp_gain': vp_gain
+            })
+
+    vp_df = pandas.DataFrame(rows)
 
     result = (
         vp_df.groupby('scoring_tile')['vp_gain']
