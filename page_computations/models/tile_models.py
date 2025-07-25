@@ -92,7 +92,7 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
     player_data = ds.player_data
     game_data = ds.game_data[['game_id', 'scoring_tiles']] 
 
-    players_filtered = player_data[player_data['year'].between(s_year, e_year)].copy()
+    players_filtered = player_data[player_data['year'].between(s_year, e_year)]
 
     if map is not None:
         players_filtered = players_filtered[players_filtered['map'] == map]
