@@ -19,6 +19,12 @@ valid_factions = [
         "shapeshifters", "riverwalkers"
         ]
 
+dlc_factions = [
+    'yetis', 'icemaidens',
+    'acolytes', 'dragonlords',
+    'riverwalkers', 'shapeshifters'
+]
+
 
 def validate_route_inputs(s_year, e_year, map=None, num_players=None, faction=None, require_map=False, require_faction=False, require_players=False):
 
@@ -49,7 +55,11 @@ def validate_route_inputs(s_year, e_year, map=None, num_players=None, faction=No
     if num_players and num_players > 6:
         return 'Player number filter out of bounds.', None
     
+    if s_year and e_year == 2013:
+        if faction in dlc_factions:
+            return 'Invalid search including DLC factions for 2013. DLC factions released in 2014.', None
+    
     if s_year < 2013 or e_year > 2025:
-        return 'Parameter out of bounds.', None
+        return 'Year parameter out of bounds.', None
     
     return None, [s_year, e_year, map, num_players, faction]

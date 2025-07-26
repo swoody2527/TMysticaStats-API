@@ -31,7 +31,7 @@ def test_invalid_year(client):
      
      assert response.status_code == 400
      data = response.get_json()
-     assert data['error'] == 'Parameter out of bounds.'
+     assert data['error'] == 'Year parameter out of bounds.'
 
 
 

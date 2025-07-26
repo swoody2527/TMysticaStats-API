@@ -73,6 +73,15 @@ def test_faction_omitted(client):
     assert data['error'] == 'Faction required for search.'
 
 
+def test_dlc_faction_error(client):
+    response = client.get('api/factions/faction-wr?' 
+    's_year=2013&e_year=2013&num_players=3&faction=yetis')
+
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['error'] == 'Invalid search including DLC factions for 2013. DLC factions released in 2014.'
+
+
 
 
 
