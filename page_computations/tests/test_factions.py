@@ -79,7 +79,7 @@ def test_dlc_faction_error(client):
 
     assert response.status_code == 400
     data = response.get_json()
-    assert data['error'] == 'Invalid search including DLC factions for 2013. DLC factions released in 2014.'
+    assert data['error'] == 'Invalid search including expansion factions for 2013. Expansion factions released in 2014.'
 
 
 

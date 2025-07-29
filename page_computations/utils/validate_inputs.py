@@ -57,7 +57,7 @@ def validate_route_inputs(s_year, e_year, map=None, num_players=None, faction=No
     
     if s_year and e_year == 2013:
         if faction in dlc_factions:
-            return 'Invalid search including DLC factions for 2013. DLC factions released in 2014.', None
+            return 'Invalid search including expansion factions for 2013. Expansion factions released in 2014.', None
     
     if s_year < 2013 or e_year > 2025:
         return 'Year parameter out of bounds.', None
