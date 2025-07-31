@@ -5,6 +5,7 @@ from page_computations.routes.faction_routes import factions_bp
 from page_computations.routes.maps_routes import maps_bp
 from page_computations.routes.tile_routes import tiles_bp
 from page_computations.routes.trends_routes import trends_bp
+from page_computations.routes.prediction_routes import predictions_bp
 
 from page_computations.utils import data_loader, data_store
 
@@ -16,6 +17,7 @@ def create_app():
     app.register_blueprint(maps_bp, url_prefix='/api/maps')
     app.register_blueprint(tiles_bp, url_prefix='/api/tiles')
     app.register_blueprint(trends_bp, url_prefix='/api/trends')
+    app.register_blueprint(predictions_bp, url_prefix='/api/predictions')
 
     game_data, player_data = data_loader.load_game_and_player_data()
     data_store.game_data = game_data
