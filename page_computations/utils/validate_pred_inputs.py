@@ -48,6 +48,14 @@ def validate_model_inputs(is_factions, num_players, map, b_tiles, s_tiles, facti
     if map not in valid_maps:
         return 'Invalid map id.', None
     
+    for tile in b_tiles:
+        if tile not in valid_bonus_tiles:
+            return 'Invalid bonus tile.'
+        
+    for tile in s_tiles:
+        if tile not in valid_score_tiles:
+            return 'Invalid score tile.'
+    
     for faction in factions:
         if faction.lower() not in valid_factions:
             return 'Invalid faction choice.', None

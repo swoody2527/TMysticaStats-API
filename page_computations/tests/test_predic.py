@@ -44,6 +44,7 @@ def test_prediction_class(client):
     query = urlencode(params)
     request_string = f'/api/predictions/win_prediction?{query}'
     response = client.get(request_string)
+    print(response.get_json())
 
     assert response.status_code == 200
 
