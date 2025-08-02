@@ -235,11 +235,11 @@ def fetch_classification_prediction(num_players, map_id, b_tiles, s_tiles, g_fac
         win_prob = model.predict_proba(input_df)[0][1]
 
         if win_prob < 0.3:
-            risk_level = 2 
+            risk_level = 3 
         elif win_prob < 0.5:
-            risk_level = 1 
+            risk_level = 2 
         else:
-            risk_level = 0 
+            risk_level = 1 
 
         prediction_results[faction] = {
             "win_prob": round(float(win_prob), 3),
