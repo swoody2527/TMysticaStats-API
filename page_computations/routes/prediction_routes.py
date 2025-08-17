@@ -4,7 +4,7 @@ from ..utils import validate_pred_inputs as val
 
 predictions_bp = Blueprint('prediction', __name__)
 
-# POSSIBLY REDUNDANT, MIGHT REMOVE
+# Redundant model, partially function and not selected for use in final implementation.
 @predictions_bp.route('/vp_prediction')
 def get_vp_diff_predictions():
     

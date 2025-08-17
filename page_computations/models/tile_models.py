@@ -103,13 +103,16 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
         players_filtered = players_filtered[players_filtered['faction'] == faction]
 
     players_filtered = (
-        players_filtered
-        .groupby('year', group_keys=False)
-        .apply(lambda x: x.sample(frac=0.5, random_state=42) if len(x) > 1 else x)
+    players_filtered
+    .groupby('year', group_keys=False)
+    .apply(
+        lambda x: x.sample(frac=0.5, random_state=42) if len(x) > 1 else x,
+        include_groups=False
     )
+)
+
 
     df = players_filtered.merge(game_data, on='game_id', how='inner')
-
 
     df['vp_by_round'] = df['vp_by_round'].map(ast.literal_eval)
     df['scoring_tiles'] = df['scoring_tiles'].map(ast.literal_eval)
@@ -119,23 +122,19 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
 
     if df.empty:
         return {}
+    
+    vp = pandas.DataFrame(df['vp_by_round'].tolist(), index=df.index).iloc[:, :6]
+    tiles = pandas.DataFrame(df['scoring_tiles'].tolist(), index=df.index).iloc[:, :6]
 
-    rows = []
-    for _, row in df.iterrows():
-        vp_list = row['vp_by_round']
-        tiles = row['scoring_tiles']
-        for i in range(6):
-            vp_gain = vp_list[i] if i == 0 else vp_list[i] - vp_list[i - 1]
-            rows.append({
-                'faction': row['faction'],
-                'scoring_tile': tiles[i],
-                'vp_gain': vp_gain
-            })
+    vp_gain = vp.diff(axis=1).fillna(vp[0], axis=0)
 
-    vp_df = pandas.DataFrame(rows)
+    long = pandas.DataFrame({
+        'scoring_tile': tiles.values.ravel(),
+        'vp_gain': vp_gain.values.ravel()
+    })
 
     result = (
-        vp_df.groupby('scoring_tile')['vp_gain']
+        long.groupby('scoring_tile')['vp_gain']
         .mean()
         .round(2)
         .reset_index()
@@ -143,3 +142,4 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
     )
 
     return result.set_index('scoring_tile')['avg_vp_gain'].to_dict()
+

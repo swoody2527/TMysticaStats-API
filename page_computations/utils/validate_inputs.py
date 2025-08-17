@@ -55,7 +55,7 @@ def validate_route_inputs(s_year, e_year, map=None, num_players=None, faction=No
     if num_players and num_players > 6:
         return 'Player number filter out of bounds.', None
     
-    if s_year and e_year == 2013:
+    if s_year == 2013 and e_year == 2013:
         if faction in dlc_factions:
             return 'Invalid search including expansion factions for 2013. Expansion factions released in 2014.', None
     
