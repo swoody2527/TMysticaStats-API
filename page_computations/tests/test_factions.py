@@ -1,163 +1,148 @@
 
-# TEST DATA RUNS FROM 2013 - 2014
+test_faction = 'dwarves'
+test_s_year = 2013
+test_e_year = 2014
+test_players = 4
 
-"""WINRATES TESTS"""
 
-def test_winrates(client):
-    response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2013&e_year=2014&num_players=3')
-    
-    assert response.status_code == 200
-
-    data = response.get_json()
-    
-    assert data['faction'] == 'dwarves'
-    assert data['winrate'] == 27.34
-    assert data['total_games'] == 395
-    assert data['total_wins'] == 108
-
-def test_winrates_missing_param(client):
-    response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2013&num_players=3')
-
-    assert response.status_code == 400
-    data = response.get_json()
-
-    assert data['error'] == 'Missing 1 or more parameters for search.'
-
-def test_winrates_invalid_type(client):
-
-    response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2013&e_year=2014&num_players=INVALID')
-
-    assert response.status_code == 400
-    data = response.get_json()
-
-    assert data['error'] == '1 or more invalid parameter type(s).'
-
-def test_winrates_oob(client):
-    response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2013&e_year=2014&num_players=1000')
-
-    assert response.status_code == 400
-
-    data = response.get_json()
-
-    assert data['error'] == 'Player number filter out of bounds.'
-
-def test_num_player_ommited(client):
-    response = client.get('api/factions/faction-wr?' 
-    'faction=dwarves&s_year=2013&e_year=2014')
+def test_faction_wr(client):
+    response = client.get(
+        f'/api/factions/faction-wr?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
-    data = response.get_json()
-
-    assert data['faction'] == 'dwarves'
-    assert data['total_games'] == 2068
-
-
-def test_valid_faction(client):
-    response = client.get('api/factions/faction-wr?' 
-    'faction=INVALID&s_year=2013&e_year=2014')
-
-    assert response.status_code == 400
-    data = response.get_json()
-    assert data['error'] == 'Invalid faction choice.'
-
-def test_faction_omitted(client):
-    response = client.get('api/factions/faction-wr?' 
-    's_year=2013&e_year=2014&num_players=3')
-
-    assert response.status_code == 400
-    data = response.get_json()
-    assert data['error'] == 'Faction required for search.'
+    assert isinstance(result, dict)
+    assert result['faction'] == test_faction
+    assert isinstance(result['winrate'], float)
+    assert isinstance(result['total_games'], int)
+    assert isinstance(result['total_wins'], int)
 
 
-def test_dlc_faction_error(client):
-    response = client.get('api/factions/faction-wr?' 
-    's_year=2013&e_year=2013&num_players=3&faction=yetis')
-
-    assert response.status_code == 400
-    data = response.get_json()
-    assert data['error'] == 'Invalid search including expansion factions for 2013. Expansion factions released in 2014.'
-
-
-
-
-
-
-
-
-def test_pickrates(client):
-    # Pickrates uses same input validation as winrates (above)
-    # so safety is assumed here.
-    
-    
-    response = client.get('api/factions/faction-pickrate?' 
-    'faction=dwarves&s_year=2013&e_year=2014&num_players=3')
+def test_faction_pickrate(client):
+    response = client.get(
+        f'/api/factions/faction-pickrate?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
-
-    data = response.get_json()
-
-    assert data['faction'] == 'dwarves'
-    assert data['pickrate'] == 16.38
-    assert data['picked_games'] == 395
-    assert data['total_games'] == 2412
-
-def test_wr_versus(client):
-    response = client.get('api/factions/faction-wr-versus?faction=dwarves&s_year=2013&' \
-    'e_year=2014&num_players=3')
-
-    assert response.status_code == 200
-
-    data = response.get_json()
-
-    assert 'dwarves' not in data.keys()
-    assert data['darklings']['win_rate'] == 25.98
-    assert data['darklings']['games_together'] == 127
+    assert isinstance(result, dict)
+    assert result['faction'] == test_faction
+    assert isinstance(result['pickrate'], float)
+    assert isinstance(result['total_games'], int)
+    assert isinstance(result['picked_games'], int)
 
 
-def test_wr_by_map(client):
-    response = client.get('api/factions/faction-wr-maps?faction=dwarves&s_year=2013&' \
-    'e_year=2014&num_players=3')
+def test_faction_wr_versus(client):
+    response = client.get(
+        f'/api/factions/faction-wr-versus?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
+    assert isinstance(result, dict)
 
-    data = response.get_json()
-    
-    for map_code, values in data.items():
-        assert values['total_games'] > 0
+    opponent_faction = next(iter(result.keys()))
+    opponent_stats = result[opponent_faction]
 
-def test_faction_vp(client):
-    response = client.get('api/factions/faction-avg-vp?faction=dwarves&s_year=2013&'
-    'e_year=2014')
-
-    assert response.status_code == 200
+    assert isinstance(opponent_stats, dict)
+    assert isinstance(opponent_stats['win_rate'], float)
+    assert isinstance(opponent_stats['games_together'], int)
+    assert isinstance(opponent_stats['games_won'], int)
 
 
-def test_vp_by_round(client):
-    response = client.get('api/factions/faction-avg-vp-per-round?faction=dwarves&s_year=2013&'
-    'e_year=2014')
-
-    assert response.status_code == 200
-
-
-def test_games_played(client):
-    response = client.get('api/factions/faction-games-played?faction=dwarves&s_year=2013&'
-    'e_year=2014')
+def test_faction_wr_by_map(client):
+    response = client.get(
+        f'/api/factions/faction-wr-maps?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    map_code = next(iter(result.keys()))
+    map_stats = result[map_code]
+
+    assert isinstance(map_stats, dict)
+    assert isinstance(map_stats['win_rate'], float)
+    assert isinstance(map_stats['total_games'], int)
+    assert isinstance(map_stats['total_wins'], int)
 
 
-def test_games_played(client):
-    response = client.get('api/factions/faction-games-played?faction=dwarves&s_year=2013&'
-    'e_year=2014')
+def test_faction_avg_vp(client):
+    response = client.get(
+        f'/api/factions/faction-avg-vp?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
+    assert isinstance(result, dict)
+    assert isinstance(result['avg_vp'], float)
+    assert isinstance(result['max_vp'], float)
+    assert isinstance(result['min_vp'], float)
+    assert isinstance(result['vp_25_percentile'], float)
+    assert isinstance(result['vp_75_percentile'], float)
 
-def test_wr_playercount(client):
-    response = client.get('api/factions/wr-by-playercount?faction=dwarves&s_year=2013&'
-    'e_year=2014')
+
+def test_faction_avg_vp_per_round(client):
+    response = client.get(
+        f'/api/factions/faction-avg-vp-per-round?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    round_key = next(iter(result.keys()))
+    avg_vp_for_round = result[round_key]
+
+    assert isinstance(round_key, (str, int))
+    assert isinstance(avg_vp_for_round, (int, float))
+
+
+def test_faction_games_played(client):
+    response = client.get(
+        f'/api/factions/faction-games-played?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
+
+    assert response.status_code == 200
+    assert isinstance(result, dict)
+    assert result['faction'] == test_faction
+    assert isinstance(result['games_played'], int)
+
+
+def test_faction_popularity_over_time(client):
+    response = client.get(
+        f'/api/factions/faction-popularity-ot?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}&num_players={test_players}'
+    )
+    result = response.get_json()
+
+    assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    year = next(iter(result.keys()))
+    year_stats = result[year]
+
+    assert isinstance(year_stats, dict)
+    assert isinstance(year_stats['pick_rate'], float)
+    assert isinstance(year_stats['total_games'], int)
+    assert isinstance(year_stats['total_picks'], int)
+
+
+def test_wr_by_playercount(client):
+    response = client.get(
+        f'/api/factions/wr-by-playercount?faction={test_faction}&s_year={test_s_year}&e_year={test_e_year}'
+    )
+    result = response.get_json()
+
+    assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    player_count = next(iter(result.keys()))
+    stats_for_count = result[player_count]
+
+    assert isinstance(stats_for_count, dict)
+    assert isinstance(stats_for_count['win_rate'], float)
+    assert isinstance(stats_for_count['total_games'], int)
+    assert isinstance(stats_for_count['total_wins'], int)

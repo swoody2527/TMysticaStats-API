@@ -34,10 +34,10 @@ def validate_route_inputs(s_year, e_year, map=None, num_players=None, faction=No
     if require_faction and not faction:
         return 'Faction required for search.', None
     if require_players and not num_players:
-        return 'Player count required for search', None
+        return 'Player count required for search.', None
     
     if not s_year or not e_year:
-        return 'Missing 1 or more parameters for search.', None
+        return 'Missing year parameters.', None
 
     if map and map not in valid_maps:
         return 'Invalid map id.', None
@@ -61,5 +61,8 @@ def validate_route_inputs(s_year, e_year, map=None, num_players=None, faction=No
     
     if s_year < 2013 or e_year > 2025:
         return 'Year parameter out of bounds.', None
+    
+    if s_year > e_year:
+        return 'Invalid year filter dates. Start year greater than end year.', None
     
     return None, [s_year, e_year, map, num_players, faction]

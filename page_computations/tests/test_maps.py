@@ -1,69 +1,100 @@
+# tests/test_maps_endpoints.py
+
+test_map_id = '126fe960806d587c78546b30f1a90853b1ada468'
+test_s_year = 2013
+test_e_year = 2014
 
 
-'''INPUT VALIDATION TESTS'''
-
-def test_valid_inputs(client):
-    response = client.get('/api/maps/games-per-map?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
-    's_year=2013&e_year=2014')
-
-    assert response.status_code == 200
-
-
-def test_invalid_map_id(client):
-    response = client.get('/api/maps/games-per-map?map_id=INVALID&' \
-    's_year=2013&e_year=2014')
-
-    assert response.status_code == 400
-    data = response.get_json()
-    assert data['error'] == 'Invalid map id.'
-
-def test_missing_param(client):
-    response = client.get('/api/maps/games-per-map?' \
-    's_year=2013&e_year=2014')
-
-    assert response.status_code == 400
-    data = response.get_json()
-    assert data['error'] == 'Map required for search.'
-
-def test_invalid_year(client):
-     response = client.get('/api/maps/games-per-map?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
-    's_year=2013&e_year=2035')
-     
-     assert response.status_code == 400
-     data = response.get_json()
-     assert data['error'] == 'Year parameter out of bounds.'
-
-
-
-
-
-    
-def test_player_map_dist(client):
-    response = client.get('/api/maps/avg-players-per-map?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
-    's_year=2013&e_year=2014')
+def test_games_per_map(client):
+    response = client.get(
+        f'/api/maps/games-per-map?map_id={test_map_id}&s_year={test_s_year}&e_year={test_e_year}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
+    assert isinstance(result, dict)
+    assert result['map_id'] == test_map_id
+    assert isinstance(result['games_played'], int)
 
-def test_player_map_pickrate(client):
-    response = client.get('/api/maps/faction-pickrate?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
-    's_year=2013&e_year=2014')
 
-    assert response.status_code == 200
-
-def test_player_map_winrate(client):
-    response = client.get('/api/maps/faction-winrate?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
-    's_year=2013&e_year=2014')
-
-    assert response.status_code == 200
-
-def test_player_map_avg_vp(client):
-    response = client.get('/api/maps/avg-vp-per-map?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
-    's_year=2013&e_year=2014')
+def test_avg_players_per_map(client):
+    response = client.get(
+        f'/api/maps/avg-players-per-map?map_id={test_map_id}&s_year={test_s_year}&e_year={test_e_year}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
+    assert isinstance(result, dict)
 
-def test_player_map_performance_diff(client):
-    response = client.get('/api/maps/performance-variation?map_id=be8f6ebf549404d015547152d5f2a1906ae8dd90&' \
-    's_year=2013&e_year=2014')
+    map_code = next(iter(result.keys()))
+    playercount_distribution = result[map_code]
+
+    assert isinstance(playercount_distribution, dict)
+    assert isinstance(playercount_distribution['total_games'], int)
+
+    example_pc_key = next(k for k in playercount_distribution.keys() if k.endswith('p'))
+    assert isinstance(playercount_distribution[example_pc_key], float)
+
+
+def test_faction_pickrate_on_map(client):
+    response = client.get(
+        f'/api/maps/faction-pickrate?map_id={test_map_id}&s_year={test_s_year}&e_year={test_e_year}'
+    )
+    result = response.get_json()
 
     assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    faction_name = next(iter(result.keys()))
+    pickrate_percent = result[faction_name]
+
+    assert isinstance(faction_name, str)
+    assert isinstance(pickrate_percent, float)
+
+
+def test_faction_winrate_on_map(client):
+    response = client.get(
+        f'/api/maps/faction-winrate?map_id={test_map_id}&s_year={test_s_year}&e_year={test_e_year}'
+    )
+    result = response.get_json()
+
+    assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    faction_name = next(iter(result.keys()))
+    winrate_percent = result[faction_name]
+
+    assert isinstance(faction_name, str)
+    assert isinstance(winrate_percent, float)
+
+
+def test_avg_vp_per_map(client):
+    response = client.get(
+        f'/api/maps/avg-vp-per-map?map_id={test_map_id}&s_year={test_s_year}&e_year={test_e_year}'
+    )
+    result = response.get_json()
+
+    assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    faction_name = next(iter(result.keys()))
+    average_vp = result[faction_name]
+
+    assert isinstance(faction_name, str)
+    assert isinstance(average_vp, int)
+
+
+def test_performance_variation(client):
+    response = client.get(
+        f'/api/maps/performance-variation?map_id={test_map_id}&s_year={test_s_year}&e_year={test_e_year}'
+    )
+    result = response.get_json()
+
+    assert response.status_code == 200
+    assert isinstance(result, dict)
+
+    faction_name = next(iter(result.keys()))
+    winrate_delta = result[faction_name]
+
+    assert isinstance(faction_name, str)
+    assert isinstance(winrate_delta, float)

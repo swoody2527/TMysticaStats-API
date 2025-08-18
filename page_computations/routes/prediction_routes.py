@@ -23,13 +23,6 @@ def get_vp_diff_predictions():
     except Exception as e:
         error = {'error': str(e)}
         return jsonify(error), 500
-    
-
-
-
-
-
-
 
 
 @predictions_bp.route('/win_prediction')
