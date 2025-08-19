@@ -262,7 +262,7 @@ def get_faction_pop_over_time():
         dict: {
         *For each year*
             <year>: {
-                "pick_rate": float,     # Pick percentage (0–100)
+                "pick_rate": float,     # Pick percentage (0/100)
                 "total_games": int,     # Total games played that year
                 "total_picks": int      # Times faction was picked
             },

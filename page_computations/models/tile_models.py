@@ -95,6 +95,7 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
 
     players_filtered = player_data[player_data['year'].between(s_year, e_year)]
 
+    # Should refactor all masks like this. Far more readable.
     if map is not None:
         players_filtered = players_filtered[players_filtered['map'] == map]
     if num_players is not None:
@@ -102,6 +103,7 @@ def fetch_vp_gained_by_scoring_tile(s_year, e_year, map=None, num_players=None, 
     if faction is not None:
         players_filtered = players_filtered[players_filtered['faction'] == faction]
 
+    # Take a 50% sample, computation too heavy. Smaller sample ok?
     players_filtered = (
     players_filtered
     .groupby('year', group_keys=False)
