@@ -4,7 +4,7 @@ from ..utils import validate_pred_inputs as val
 
 predictions_bp = Blueprint('prediction', __name__)
 
-# Redundant model, partially function and not selected for use in final implementation.
+# Redundant model, partially functional and not selected for use in final implementation.
 @predictions_bp.route('/vp_prediction')
 def get_vp_diff_predictions():
     
@@ -27,6 +27,32 @@ def get_vp_diff_predictions():
 
 @predictions_bp.route('/win_prediction')
 def get_win_prediction():
+
+    """
+    Predicts win probabilities for all factions not already selected in a game draft,
+    based on map, number of players, bonus/score tiles, and chosen factions.
+
+    Args:
+        num_players (int): Number of players in the game.
+        map_id (str): Map identifier.
+        b_tiles (list[str]): List of bonus tile identifiers.
+        s_tiles (list[str]): List of scoring tile identifiers.
+        g_factions (list[str]): List of factions already selected in the draft. OPTIONAL
+
+    Returns:
+        dict:
+              {
+              *For each other faction than user selected*
+                  <faction>: {
+                      "win_prob": float,   # Predicted win probability (0/1)
+                      "risk_level": int    # Risk level classification:
+                                           #   1 = Low risk (>= 50% win prob)
+                                           #   2 = Medium risk (30–49% win prob)
+                                           #   3 = High risk (< 30% win prob)
+                  },
+
+              }
+    """
     
     
     is_factions = request.args.get('factions_included', 'false').lower() == 'true'

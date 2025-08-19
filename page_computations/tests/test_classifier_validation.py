@@ -6,48 +6,56 @@ test_s_tiles = [f'SCORE{i+1}' for i in range(6)]
 test_b_tiles = [f'BON{i+1}' for i in range(7)]
 
 def test_missing_map_players():
+    # No map or player parameters
     err, res = val.validate_model_inputs(None, None, None, test_b_tiles, test_s_tiles, None)
 
     assert res is None
     assert err == 'Missing player number or map parameter.'
 
 def test_missing_tiles():
+    # Tile lists empty
     err, res = val.validate_model_inputs(None, test_player, test_map, [], [], None)
 
     assert res is None
     assert err == 'Missing bonus/scoring tile information.'
 
 def test_invalid_num_player_type():
+    # Num player cannot be cast to int
     err, res = val.validate_model_inputs(None, 'INVALID STRING', test_map, test_s_tiles, test_b_tiles, None)
     
     assert res is None
     assert err == 'Invalid type for No. Players'
 
 def test_num_players_oob():
+    # Num players out of range
     err, res = val.validate_model_inputs(None, 10, test_map, test_s_tiles, test_b_tiles, None)
 
     assert res is None
     assert err == 'Cannot make predictions. No. players must be between 2 and 5'
 
 def test_invalid_map():
+    # Map Id does not match a valid map
     err, res = val.validate_model_inputs(None, test_player, 'INVALID MAP', test_b_tiles, test_s_tiles, None)
 
     assert res is None
     assert err == 'Invalid map id.'
 
 def test_invalid_b_tile():
+    # Invalid tile within bonus tiles
     err, res = val.validate_model_inputs(None, test_player, test_map, ['INVALID B TILE'], test_s_tiles, None)
 
     assert res is None
     assert err == 'Invalid bonus tile.'
 
 def test_invalid_s_tile():
+    # Invalid score tile within score tiles.
     err, res = val.validate_model_inputs(None, test_player, test_map, test_b_tiles, ['INVALID S TILE'], None)
 
     assert res is None
     assert err == 'Invalid score tile.'
 
 def test_happy_path():
+    # All valid inputs, no error.
     err, res = val.validate_model_inputs(None, test_player, test_map, test_b_tiles, test_s_tiles, None)
 
     assert err is None
